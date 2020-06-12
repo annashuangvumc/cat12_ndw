@@ -1,0 +1,155 @@
+---
+moreauto: true
+procversion: 1.0.0
+procname: cat12_ndw
+proctype: cat12_ndw_v1
+
+inputs:
+    defaults:
+         container_path: 
+         container_source: 
+         extraflags: ""
+    xnat:
+         scans:
+           - name: t1scan
+             types: 'T1W/3D/TFE','T1W/3D/TFE/new','T1_3DAXIAL','MPRAGE_SIEMENS_DEFACED'
+             needs_qc: False
+             resources:
+                  - resource: NIFTI
+                    ftype: FILE
+                    fdest: t1.nii.gz
+                    varname: t1_niigz
+                    match: '*'
+                    fcount: 1
+
+    attrs:
+      - varname: xnat_proj
+        object: assessor
+        attr: project
+      - varname: xnat_subj
+        object: session
+        attr: subject_label
+      - varname: xnat_sess
+        object: session
+        attr: label
+      - varname: xnat_t1scan
+        object: scan
+        attr: ID
+        ref: t1scan
+outputs:
+  - path: catreport_t1.pdf
+    type: FILE
+    resource: PDF
+  - path: cat_t1.xml
+    type: FILE
+    resource: REPORT
+  - path: catlog_t1.txt
+    type: FILE
+    resource: LOG
+  - path: cat_t1.mat
+    type: FILE
+    resource: MAT
+  - path: TIV.txt
+    type: FILE
+    resource: TIV
+  - path: label
+    type: DIR
+    resource: LABEL
+  - path: surf
+    type: DIR
+    resource: SURFACE
+  - path: iy_t1.nii.gz
+    type: FILE
+    resource: DEF_INV
+  - path: y_t1.nii.gz
+    type: FILE
+    resource: DEF_FWD
+  - path: mt1.nii.gz
+    type: FILE
+    resource: BIAS_CORR
+  - path: mwp1t1.nii.gz
+    type: FILE
+    resource: GRAY_MNORM
+  - path: mwp2t1.nii.gz
+    type: FILE
+    resource: WHITE_MNORM
+  - path: mwp3t1.nii.gz
+    type: FILE
+    resource: CSF_MNORM
+  - path: mit1.nii.gz
+    type: FILE
+    resource: LOCAL_BIAS
+  - path: p0t1.nii.gz
+    type: FILE
+    resource: ICV_NATIVE
+  - path: p1t1.nii.gz
+    type: FILE
+    resource: GRAY_NATIVE
+  - path: p2t1.nii.gz
+    type: FILE
+    resource: WHITE_NATIVE
+  - path: p3t1.nii.gz
+    type: FILE
+    resource: CSF_NATIVE
+  - path: wj_t1.nii.gz
+    type: FILE
+    resource: JACOBIAN
+  - path: wmt1.nii.gz
+    type: FILE
+    resource: BIAS_NORM
+  - path: wmit1.nii.gz
+    type: FILE
+    resource: LOCAL_NORM
+  - path: wp0t1.nii.gz
+    type: FILE
+    resource: ICV_NORM
+  - path: wp1t1.nii.gz
+    type: FILE
+    resource: GRAY_NORM
+  - path: wp2t1.nii.gz
+    type: FILE
+    resource: WHITE_NORM
+  - path: wp3t1.nii.gz
+    type: FILE
+    resource: CSF_NORM
+  - path: rmt1_affine.nii.gz
+    type: FILE
+    resource: BIAS_AFFINE
+  - path: rp0t1_affine.nii.gz
+    type: FILE
+    resource: ICV_AFFINE
+  - path: rp1t1_affine.nii.gz
+    type: FILE
+    resource: GRAY_AFFINE
+  - path: rp2t1_affine.nii.gz
+    type: FILE
+    resource: WHITE_AFFINE
+  - path: rp3t1_affine.nii.gz
+    type: FILE
+    resource: CSF_AFFINE
+  - path: rmit1_affine.nii.gz
+    type: FILE
+    resource: LOCAL_AFFINE
+
+command: >-
+  singularity
+  run
+  --cleanenv
+  --home $INDIR
+  --bind $INDIR:/INPUTS
+  --bind $OUTDIR:/OUTPUTS
+  {container_path}
+  skullstrip 2
+  t1_niigz /INPUTS/{t1_niigz}
+  out_dir /OUTPUTS
+  xnat_project {xnat_proj}
+  xnat_subject {xnat_proj}
+  xnat_session {xnat_sess}
+  xnat_scan_t1 {xnat_t1scan}
+
+attrs:
+  xsitype: proc:genProcData
+  walltime: '3:00:00'
+  memory: 12080
+  ppn: 1
+jobtemplate: job_template.txt
